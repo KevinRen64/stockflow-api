@@ -50,4 +50,10 @@ public class AuthController : ControllerBase
 
     return Ok(result.Value);
   }
+
+  // [HttpGet("test-error")]
+  // public IActionResult TestError()
+  // {
+  //     throw new Exception("This is a test exception.");
+  // }
 }

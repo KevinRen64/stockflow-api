@@ -39,14 +39,8 @@ public class InventoryController : ControllerBase
   [HttpGet("{productId:guid}")]
   public async Task<IActionResult> GetByProductId(Guid productId, CancellationToken ct)
   {
-    var result = await _inventoryService.GetByProductIdAsync(productId, ct);
-    
-    if(!result.IsSuccess)
-    {
-      return NotFound(new { message = result.Error });
-    }
-
-    return Ok(result.Value);
+    var order = await _inventoryService.GetByProductIdAsync(productId, ct);
+    return Ok(order);
   }
 
 }

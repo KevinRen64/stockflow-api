@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StockFlow.Application.Common;
+using StockFlow.Application.Common.Exceptions;
 using StockFlow.Domain.Entities;
 using StockFlow.Infrastructure.Data;
 
@@ -145,16 +146,16 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     }
 }
 
-  public async Task<Result<OrderDto>> GetByIdAsync(Guid id, CancellationToken ct)
+  public async Task<OrderDto> GetByIdAsync(Guid id, CancellationToken ct)
   {
     var order = await _db.Orders.Include(x => x.Lines).FirstOrDefaultAsync(x => x.Id == id, ct);
 
     if(order == null)
     {
-      return Result<OrderDto>.Failure("Order not found.", "order_not_found");
+      throw new NotFoundException("Order not found.", "order_not_found");
     }
 
-    return Result<OrderDto>.Success(MapToDto(order));
+    return MapToDto(order);
   }
 
   public async Task<IReadOnlyList<OrderDto>> GetAllAsync(string? status, CancellationToken ct)
@@ -175,7 +176,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     return orders.Select(MapToDto).ToList();
   }
   
-  public async Task<Result<OrderDto>> CancelAsync(Guid id, CancellationToken ct)
+  public async Task<OrderDto> CancelAsync(Guid id, CancellationToken ct)
   {
     await using var tx = await _db.Database.BeginTransactionAsync(ct);
 
@@ -188,12 +189,12 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
       
       if(order == null)
       {
-        return Result<OrderDto>.Failure("Order not found.", "order_not_found");
+        throw new NotFoundException("Order not found.", "order_not_found");
       }
 
       if(order.Status != "Pending")
       {
-        return Result<OrderDto>.Failure("Only pending orders can be cancelled.", "invalid_order_status");
+        throw new ConflictException("Only pending orders can be cancelled.", "invalid_order_status");
       }
 
       // Cancel order logic
@@ -204,14 +205,14 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         
         if(inventory == null)
         {
-          return Result<OrderDto>.Failure(
+          throw new NotFoundException(
             $"Inventory not found for product {line.ProductId}.",
             "inventory_not_found");
         }
 
         if (inventory.Reserved < line.Quantity)
         {
-            return Result<OrderDto>.Failure(
+            throw new ConflictException(
                 "Reserved stock is less than the order quantity.",
                 "invalid_reserved_stock");
         }
@@ -238,7 +239,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         order.Id,
         order.OrderNumber);
 
-      return Result<OrderDto>.Success(MapToDto(order));
+      return MapToDto(order);
     }
 
     catch(DbUpdateConcurrencyException ex)
@@ -250,7 +251,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         "Order cancellation concurrency conflict for OrderId {OrderId}",
         id);
 
-      return Result<OrderDto>.Failure(
+      throw new ConflictException(
         "The inventory was updated by another request. Please retry.",
         "inventory_concurrency_conflict");
     }
@@ -262,7 +263,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     }
   }
   
-  public async Task<Result<OrderDto>> ConfirmAsync(Guid id, CancellationToken ct)
+  public async Task<OrderDto> ConfirmAsync(Guid id, CancellationToken ct)
   {
     await using var tx = await _db.Database.BeginTransactionAsync(ct);
     try
@@ -274,12 +275,12 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
 
       if(order == null)
       {
-        return Result<OrderDto>.Failure("Order not found.", "order_not_found");
+        throw new NotFoundException("Order not found.", "order_not_found");
       }
 
       if(order.Status != "Pending")
       {
-        return Result<OrderDto>.Failure("Only pending orders can be confirmed.", "invalid_order_status");
+        throw new ConflictException("Only pending orders can be confirmed.", "invalid_order_status");
       }
 
       // Confirm order logic
@@ -290,21 +291,21 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         
         if(inventory == null)
         {
-          return Result<OrderDto>.Failure(
+          throw new NotFoundException(
             $"Inventory not found for product {line.ProductId}.",
             "inventory_not_found");        
         }
 
         if(inventory.Reserved < line.Quantity)
         {
-          return Result<OrderDto>.Failure(
+          throw new ConflictException(
             "Reserved stock is less than the order quantity.",
             "invalid_reserved_stock");
         }
 
         if(inventory.OnHand < line.Quantity)
         {
-          return Result<OrderDto>.Failure(
+          throw new ConflictException(
             "On-hand stock is less than the order quantity.",
             "insufficient_onhand_stock");
         }
@@ -324,9 +325,6 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
 
       order.Status = "Confirmed";
 
-
-
-
       await _db.SaveChangesAsync(ct);
       await tx.CommitAsync(ct);
 
@@ -335,7 +333,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         order.Id,
         order.OrderNumber);
 
-      return Result<OrderDto>.Success(MapToDto(order));
+      return MapToDto(order);
     }
     catch(DbUpdateConcurrencyException ex)
     {
@@ -346,7 +344,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         "Order confirmation concurrency conflict for OrderId {OrderId}",
         id);
 
-      return Result<OrderDto>.Failure(
+      throw new ConflictException(
         "The inventory was updated by another request. Please retry.",
         "inventory_concurrency_conflict");
     }
@@ -357,7 +355,7 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     }
   }
 
-  public async Task<Result<OrderDto>> ShipAsync(Guid id, CancellationToken ct)
+  public async Task<OrderDto> ShipAsync(Guid id, CancellationToken ct)
   {
     var order = await _db.Orders
         .Include(x => x.Lines)
@@ -365,12 +363,12 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     
     if(order == null)
     {
-      return Result<OrderDto>.Failure("Order not found.", "order_not_found");
+      throw new NotFoundException("Order not found.", "order_not_found");
     }
 
     if(order.Status != "Confirmed")
     {
-      return Result<OrderDto>.Failure("Only confirmed orders can be shipped.", "invalid_order_status");
+      throw new ConflictException("Only confirmed orders can be shipped.", "invalid_order_status");
     }
 
     order.Status = "Shipped";
@@ -391,15 +389,15 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         "Order shipping conflict for OrderId {OrderId}",
         order.Id);
 
-      return Result<OrderDto>.Failure(
+      throw new ConflictException(
         "Order was updated by another request. Please retry.",
         "order_conflict");
     }
 
-    return Result<OrderDto>.Success(MapToDto(order));
+    return MapToDto(order);
   }
 
-  public async Task<Result<OrderDto>> CompleteAsync(Guid id, CancellationToken ct)
+  public async Task<OrderDto> CompleteAsync(Guid id, CancellationToken ct)
   {
     var order = await _db.Orders
         .Include(x => x.Lines)
@@ -407,12 +405,12 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     
     if(order == null)
     {
-      return Result<OrderDto>.Failure("Order not found.", "order_not_found");
+      throw new NotFoundException("Order not found.", "order_not_found");
     }
 
     if(order.Status != "Shipped")
     {
-      return Result<OrderDto>.Failure("Only shipped orders can be completed.", "invalid_order_status");
+      throw new ConflictException("Only shipped orders can be completed.", "invalid_order_status");
     }
 
     order.Status = "Completed";
@@ -433,10 +431,10 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
         "Order completion conflict for OrderId {OrderId}",
         order.Id);
 
-      return Result<OrderDto>.Failure("Order was updated by another request. Please retry. ", "order_conflict");
+      throw new ConflictException("Order was updated by another request. Please retry. ", "order_conflict");
     }
 
-    return Result<OrderDto>.Success(MapToDto(order));
+    return MapToDto(order);
   }
 
   private static OrderDto MapToDto(Order order)

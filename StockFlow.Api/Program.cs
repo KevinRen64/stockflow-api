@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using StockFlow.Application.Auth;
+using StockFlow.Api.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // Serilog
@@ -86,6 +87,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+app.UseGlobalExceptionMiddleware();
 app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())

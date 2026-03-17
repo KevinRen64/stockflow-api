@@ -1,7 +1,6 @@
-using System.Data.Common;
-using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using StockFlow.Application.Common;
+using StockFlow.Application.Common.Exceptions;
 using StockFlow.Domain.Entities;
 using StockFlow.Infrastructure.Data;
 
@@ -42,7 +41,7 @@ public class ProductService : IProductService
     return Result<ProductDto>.Success(MapToDto(product));
   }
 
-  public async Task<Result<ProductDto>> GetByIdAsync(Guid id, CancellationToken ct)
+  public async Task<ProductDto> GetByIdAsync(Guid id, CancellationToken ct)
   {
     var product = await _db.Products
     .AsNoTracking()
@@ -50,9 +49,9 @@ public class ProductService : IProductService
 
     if(product is null)
     {
-      return Result<ProductDto>.Failure("Product not found. ", "product_not_found");
+      throw new NotFoundException("Product not found.", "product_not_found");
     }
-    return Result<ProductDto>.Success(MapToDto(product));
+    return MapToDto(product);
   }
 
   private static ProductDto MapToDto(Product product)
