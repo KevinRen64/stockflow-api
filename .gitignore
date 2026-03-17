@@ -1,6 +1,10 @@
 bin/
 obj/
 .vs/
+.vscode/
 *.user
 *.suo
+*.cache
+*.pdb
+*.log
 appsettings.Development.json
