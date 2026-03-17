@@ -40,13 +40,7 @@ public class ProductsController : ControllerBase
   [HttpGet("{id:guid}")]
   public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
   {
-    var result = await _service.GetByIdAsync(id, ct);
-
-    if(!result.IsSuccess)
-    {
-      return NotFound(new { message = result.Error });
-    }
-
-    return Ok(result.Value);
+    var product = await _service.GetByIdAsync(id, ct);
+    return Ok(product);
   }
 }

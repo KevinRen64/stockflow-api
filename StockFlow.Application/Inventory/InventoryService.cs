@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StockFlow.Application.Common;
+using StockFlow.Application.Common.Exceptions;
 using StockFlow.Domain.Entities;
 using StockFlow.Infrastructure.Data;
 
@@ -29,7 +30,7 @@ public class InventoryService : IInventoryService
 
         if (!productExists)
         {
-            return Result<InventoryDto>.Failure(
+            throw new NotFoundException(
                 "Product not found.",
                 "product_not_found");
         }
@@ -127,7 +128,7 @@ public class InventoryService : IInventoryService
                 "Inventory concurrency conflict for ProductId {ProductId}",
                 request.ProductId);
 
-            return Result<InventoryDto>.Failure(
+            throw new ConflictException(
                 "Inventory was updated by another request. Please retry.",
                 "inventory_conflict");
         }
@@ -138,13 +139,13 @@ public class InventoryService : IInventoryService
                 "Inventory initialization conflict for ProductId {ProductId}",
                 request.ProductId);
 
-            return Result<InventoryDto>.Failure(
+            throw new ConflictException(
                 "Inventory already exists for this product.",
                 "inventory_already_initialized");
         }
     }
 
-    public async Task<Result<InventoryDto>> GetByProductIdAsync(Guid productId, CancellationToken ct)
+    public async Task<InventoryDto> GetByProductIdAsync(Guid productId, CancellationToken ct)
     {
         var inventory = await _db.InventoryItems
             .AsNoTracking()
@@ -152,12 +153,12 @@ public class InventoryService : IInventoryService
 
         if (inventory is null)
         {
-            return Result<InventoryDto>.Failure(
+            throw new NotFoundException(
                 "Inventory not found.",
                 "inventory_not_found");
         }
 
-        return Result<InventoryDto>.Success(MapToDto(inventory));
+        return MapToDto(inventory);
     }
 
     private static InventoryDto MapToDto(InventoryItem inventory)
