@@ -1,0 +1,17 @@
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Application.deps.json
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Application.dll
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Application.pdb
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Domain.dll
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Infrastructure.dll
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Domain.pdb
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\bin\Debug\net8.0\StockFlow.Infrastructure.pdb
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.csproj.AssemblyReference.cache
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.AssemblyInfoInputs.cache
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.AssemblyInfo.cs
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.csproj.CoreCompileInputs.cache
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlo.57E4E909.Up2Date
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.dll
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\refint\StockFlow.Application.dll
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\StockFlow.Application.pdb
+C:\Users\Junzhang Ren\Desktop\StockFlow\StockFlow.Application\obj\Debug\net8.0\ref\StockFlow.Application.dll
