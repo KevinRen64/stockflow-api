@@ -1,10 +1,10 @@
 bin/
 obj/
 .vs/
-.vscode/
+.idea/
 *.user
 *.suo
-*.cache
-*.pdb
 *.log
-appsettings.Development.json
+.DS_Store
+Thumbs.db
+**/appsettings.Development.json
