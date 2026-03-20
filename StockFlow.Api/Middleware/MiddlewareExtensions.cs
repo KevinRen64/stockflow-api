@@ -6,4 +6,9 @@ public static class MiddlewareExtensions
   {
     return app.UseMiddleware<GlobalExceptionMiddleware>();
   }
+
+  public static IApplicationBuilder UseCorrelationIdMiddleware(this IApplicationBuilder app)
+  {
+    return app.UseMiddleware<CorrelationIdMiddleware>();
+  }
 }

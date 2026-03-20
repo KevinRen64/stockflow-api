@@ -21,7 +21,9 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}"
+    )
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -87,6 +89,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+app.UseCorrelationIdMiddleware();
 app.UseGlobalExceptionMiddleware();
 app.UseSerilogRequestLogging();
 
