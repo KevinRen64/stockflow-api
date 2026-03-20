@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockFlow.Application.Common;
 using StockFlow.Application.Orders;
 
 namespace StockFlow.Api.Controllers;
@@ -67,9 +68,16 @@ public class OrderController : ControllerBase
   }
 
   [HttpGet]
-  public async Task<IActionResult> GetAll(string? status, CancellationToken ct)
+  public async Task<ActionResult<PagedResult<OrderDto>>> GetAll(
+    [FromQuery] string? status, 
+    [FromQuery] string? keyword, 
+    [FromQuery] int page = 1, 
+    [FromQuery] int pageSize = 10, 
+    [FromQuery] string? sortBy = "createdAt", 
+    [FromQuery] bool desc = true, 
+    CancellationToken ct = default)
   {
-    var orders = await _service.GetAllAsync(status, ct);
+    var orders = await _service.GetAllAsync(status, keyword, page, pageSize, sortBy, desc, ct);
     return Ok(orders);
   }
 

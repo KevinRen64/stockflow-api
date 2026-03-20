@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
 using StockFlow.Application.Common;
 using StockFlow.Domain.Entities;
@@ -157,10 +158,15 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
     return Result<OrderDto>.Success(MapToDto(order));
   }
 
-  public async Task<IReadOnlyList<OrderDto>> GetAllAsync(string? status, CancellationToken ct)
+  public async Task<PagedResult<OrderDto>> GetAllAsync(string? status, string? keyword, int page, int pageSize, string? sortBy, bool desc, CancellationToken ct)
   {
+    page = page < 1 ? 1 : page;
+    pageSize = pageSize < 1 ? 10 : pageSize;
+    pageSize = pageSize > 100 ? 100 : pageSize;
+
     var query = _db.Orders
         .Include(x => x.Lines)
+        .AsNoTracking()
         .AsQueryable();
 
     if(!string.IsNullOrWhiteSpace(status))
@@ -168,11 +174,43 @@ public async Task<Result<OrderDto>> CreateAsync(CreateOrderRequest req, string i
       query = query.Where(x => x.Status == status);
     }
 
+    if(!string.IsNullOrWhiteSpace(keyword))
+    {
+      query = query.Where(x =>
+        x.OrderNumber.Contains(keyword) ||
+        x.CustomerName.Contains(keyword)
+      );
+    }
+
+    query = (sortBy?.ToLower()) switch
+    {
+      "createdat" => desc
+        ? query.OrderByDescending(x => x.CreatedAt)
+        : query.OrderBy(x => x.CreatedAt),
+
+      "status" => desc
+        ? query.OrderByDescending(x => x.Status)
+        : query.OrderBy(x => x.Status),
+
+      "id" => desc
+        ? query.OrderByDescending(x => x.Id)
+        : query.OrderBy(x => x.Id),
+
+      _ => desc
+        ? query.OrderByDescending(x => x.CreatedAt)
+        : query.OrderBy(x => x.CreatedAt)
+    };
+
+    var totalCount = await query.CountAsync();
+
     var orders = await query
-        .OrderByDescending(x => x.CreatedAt)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
         .ToListAsync(ct);
     
-    return orders.Select(MapToDto).ToList();
+    var items = orders.Select(MapToDto).ToList();
+
+    return PagedResult<OrderDto>.Create(items, page, pageSize, totalCount);
   }
   
   public async Task<Result<OrderDto>> CancelAsync(Guid id, CancellationToken ct)
