@@ -1,8 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using StockFlow.Application.Products;
-using StockFlow.Domain.Entities;
-using StockFlow.Infrastructure.Data;
+
 
 namespace StockFlow.Api.Controllers;
 
@@ -19,6 +18,7 @@ public class ProductsController : ControllerBase
 
 
   [HttpPost]
+  [Authorize(Roles = "Admin")]
   public async Task<IActionResult> Create(CreateProductRequest req, CancellationToken ct)
   {
     var result = await _service.CreateAsync(req, ct);
@@ -38,6 +38,7 @@ public class ProductsController : ControllerBase
   }
 
   [HttpGet("{id:guid}")]
+  [AllowAnonymous]
   public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
   {
     var product = await _service.GetByIdAsync(id, ct);

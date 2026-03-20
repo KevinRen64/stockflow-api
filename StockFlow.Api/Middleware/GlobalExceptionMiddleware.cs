@@ -60,13 +60,13 @@ public class GlobalExceptionMiddleware
         break;
       
       case ConflictException conflictEx:
-        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+        context.Response.StatusCode = (int)HttpStatusCode.Conflict;
         response.Code = conflictEx.Code;
         response.Message = conflictEx.Message;
         break;
 
       case ValidationException validationEx:
-        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         response.Code = validationEx.Code;
         response.Message = validationEx.Message;
         break;

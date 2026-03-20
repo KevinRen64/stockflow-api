@@ -7,6 +7,7 @@ namespace StockFlow.Api.Controllers;
 
 [ApiController]
 [Route("api/inventory")]
+[Authorize]
 public class InventoryController : ControllerBase
 {
   private readonly IInventoryService _inventoryService;

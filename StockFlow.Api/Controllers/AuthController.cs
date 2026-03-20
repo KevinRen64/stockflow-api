@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockFlow.Application.Auth;
-using StockFlow.Application.Common;
 
 namespace StockFlow.Api.Controllers;
 
@@ -16,6 +16,7 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("register")]
+  [AllowAnonymous]
   public async Task<IActionResult> Register(RegisterRequest req)
   {
     var result = await _service.RegisterAsync(req);
@@ -36,6 +37,7 @@ public class AuthController : ControllerBase
   }
 
   [HttpPost("login")]
+  [AllowAnonymous]
   public async Task<IActionResult> Login(LoginRequest req)
   {
     var result = await _service.LoginAsync(req);
