@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockFlow.Application", "St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockFlow.Infrastructure", "StockFlow.Infrastructure\StockFlow.Infrastructure.csproj", "{466B9B7F-0ADE-47B5-8C46-71A13434D47A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockFlow.IntegrationTests", "StockFlow.IntegrationTests\StockFlow.IntegrationTests.csproj", "{395D1FB0-D0AF-4749-BDDE-F5AC2E93C13A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{466B9B7F-0ADE-47B5-8C46-71A13434D47A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{466B9B7F-0ADE-47B5-8C46-71A13434D47A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{466B9B7F-0ADE-47B5-8C46-71A13434D47A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{395D1FB0-D0AF-4749-BDDE-F5AC2E93C13A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{395D1FB0-D0AF-4749-BDDE-F5AC2E93C13A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{395D1FB0-D0AF-4749-BDDE-F5AC2E93C13A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{395D1FB0-D0AF-4749-BDDE-F5AC2E93C13A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
