@@ -51,20 +51,20 @@ robust API design, and real-world backend engineering practices.
 
 The project follows a layered architecture:
 
-StockFlow.Api → Controllers / Middleware\
-StockFlow.Application → Business Logic (Services)\
-StockFlow.Domain → Core Entities\
+StockFlow.Api → Controllers / Middleware
+StockFlow.Application → Business Logic (Services)
+StockFlow.Domain → Core Entities
 StockFlow.Infrastructure → EF Core / Database
 
--   Separation of concerns\
--   Testable business logic\
+-   Separation of concerns
+-   Testable business logic
 -   Scalable structure
 
 ------------------------------------------------------------------------
 
 ### ⚠️ Global Exception Handling
 
--   Centralized exception middleware\
+-   Centralized exception middleware
 -   Consistent API error responses
 
 Custom exceptions: - NotFoundException - ConflictException -
@@ -74,16 +74,16 @@ ValidationException
 
 ### 🔄 Idempotency Support
 
--   Prevents duplicate order creation\
--   Safe retry mechanism for API calls\
+-   Prevents duplicate order creation
+-   Safe retry mechanism for API calls
 -   Important for real-world distributed systems
 
 ------------------------------------------------------------------------
 
 ### 🧾 Logging & Observability
 
--   Structured logging with Serilog\
--   Request tracing with Correlation ID\
+-   Structured logging with Serilog
+-   Request tracing with Correlation ID
 -   Improved debugging and traceability
 
 ------------------------------------------------------------------------
@@ -94,12 +94,12 @@ The project includes both unit tests and integration tests.
 
 ### 🔹 Unit Tests
 
--   Focus on business logic (e.g. ProductService)\
+-   Focus on business logic (e.g. ProductService)
 -   Use EF Core InMemory database
 
 ### 🔹 Integration Tests
 
--   Test full API pipeline\
+-   Test full API pipeline
 -   Validate HTTP responses and middleware behavior
 
 ------------------------------------------------------------------------
@@ -128,9 +128,9 @@ docker build -t stockflow-api .
 
 ### Run Container
 
-docker run -d -p 5000:80 \
-  -e ASPNETCORE_ENVIRONMENT=Docker \
-  --name stockflow \
+docker run -d -p 5000:80 
+  -e ASPNETCORE_ENVIRONMENT=Docker 
+  --name stockflow 
   stockflow-api
 
 ### API will be available at:
@@ -149,11 +149,11 @@ POST /api/products
 
 ## 🎯 What This Project Demonstrates
 
--   Production-style API design\
--   Clean architecture in .NET\
--   Logging, validation, idempotency\
--   Unit + integration testing\
-- Containerized application with Docker\
+-   Production-style API design
+-   Clean architecture in .NET
+-   Logging, validation, idempotency
+-   Unit + integration testing
+- Containerized application with Docker
 
 ------------------------------------------------------------------------
 
