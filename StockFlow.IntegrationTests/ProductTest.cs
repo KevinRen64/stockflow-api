@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using StockFlow.Domain.Entities;
 using StockFlow.Infrastructure.Data;
+using Xunit;
 
 namespace StockFlow.IntegrationTests;
 

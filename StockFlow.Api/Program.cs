@@ -29,9 +29,16 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // DbContext
-builder.Services.AddDbContext<StockFlowDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("StockFlowDb")));
-
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<StockFlowDbContext>(opt =>
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("StockFlowDb")));
+}
+else
+{
+    builder.Services.AddDbContext<StockFlowDbContext>(opt =>
+        opt.UseInMemoryDatabase("StockFlowDb"));
+}
 // Identity
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
