@@ -120,6 +120,25 @@ dotnet test
 
 ------------------------------------------------------------------------
 
+## 🐳 Run with Docker
+
+### Build Docker Image
+
+docker build -t stockflow-api .
+
+### Run Container
+
+docker run -d -p 5000:80 \
+  -e ASPNETCORE_ENVIRONMENT=Docker \
+  --name stockflow \
+  stockflow-api
+
+### API will be available at:
+
+http://localhost:5000
+
+------------------------------------------------------------------------
+
 ## 📌 API Example
 
 POST /api/products
@@ -133,7 +152,8 @@ POST /api/products
 -   Production-style API design\
 -   Clean architecture in .NET\
 -   Logging, validation, idempotency\
--   Unit + integration testing
+-   Unit + integration testing\
+- Containerized application with Docker\
 
 ------------------------------------------------------------------------
 
@@ -141,4 +161,3 @@ POST /api/products
 
 -   Cloud deployment (Azure)\
 -   CI/CD pipeline\
--   Docker
