@@ -9,14 +9,79 @@ trigger:
 pool:
   name: Default
 
-steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '8.0.x'
+variables:
+  buildConfiguration: 'Release'
+  publishDir: '$(Build.ArtifactStagingDirectory)\publish'
 
-- script: dotnet restore
-  displayName: Restore
+stages:
+  - stage: BuildStage
+    displayName: Build and Publish
+    jobs:
+    - job: BuildJob
+      displayName: Build StockFlow
+      steps:
+      - checkout: self
 
-- script: dotnet build --configuration Release
-  displayName: Build
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          packageType: 'sdk'
+          version: '8.0.x'
+
+      - script: |
+          echo Build.SourcesDirectory = $(Build.SourcesDirectory)
+          echo Build.ArtifactStagingDirectory=$(Build.ArtifactStagingDirectory)
+          echo Pipeline.Workspace=$(Pipeline.Workspace)
+        displayName: Show build workspace info
+
+      - script: dotnet restore
+        displayName: Restore
+
+      - script: dotnet build --configuration $(buildConfiguration) --no-restore
+        displayName: Build
+      
+      - script: dotnet publish StockFlow.Api/StockFlow.Api.csproj --configuration $(buildConfiguration) --output "$(publishDir)" --no-build
+        displayName: Publish API
+
+      - script: |
+          echo Listing published files...
+          dir "$(publishDir)"
+        displayName: List publish output
+
+      - publish: $(publishDir)
+        artifact: stockflow-api
+        displayName: Publish pipeline artifact
+
+  - stage: InspectStage
+    displayName: Inspect Artifact
+    dependsOn: BuildStage
+    jobs:
+    - job: InspectJob
+      displayName: Download and Inspect Artifact
+      steps: 
+      - checkout: none
+    
+      - script: |
+          echo Build.SourcesDirectory=$(Build.SourcesDirectory)
+          echo Build.ArtifactStagingDirectory=$(Build.ArtifactStagingDirectory)
+          echo Pipeline.Workspace=$(Pipeline.Workspace)
+        displayName: Show inspect workspace info
+
+      - script: |
+          echo Checking if publish folder exists before artifact download...
+          if exist "$(Build.ArtifactStagingDirectory)\publish" (
+            echo Found publish folder:
+            dir "$(Build.ArtifactStagingDirectory)\publish"
+          ) else (
+            echo No publish folder exists before download
+          )
+        displayName: Prove job isolation
+      
+      - download: current
+        artifact: stockflow-api
+        displayName: Download artifact
+
+      - script: |
+          echo Listing downloaded artifact files...
+          dir "$(Pipeline.Workspace)\stockflow-api"
+        displayName: List downloaded artifact files
