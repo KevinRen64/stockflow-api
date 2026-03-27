@@ -15,7 +15,7 @@ variables:
 
 stages:
   - stage: BuildStage
-    displayName: Build and Publish
+    displayName: Build, Test and Analyze
     jobs:
     - job: BuildJob
       displayName: Build StockFlow
@@ -34,6 +34,15 @@ stages:
           echo Pipeline.Workspace=$(Pipeline.Workspace)
         displayName: Show build workspace info
 
+      - task: SonarCloudPrepare@4
+        displayName: Prepare SonarCloud analysis
+        inputs:
+          SonarCloud: 'sonarcloud-connection-prod'
+          organization: 'kevinren64'
+          scannerMode: 'dotnet'
+          projectKey: 'KevinRen64_stockflow-api'
+          projectName: 'stockflow-api'
+
       - script: dotnet restore StockFlow.sln
         displayName: Restore
 
@@ -50,6 +59,14 @@ stages:
           testResultsFiles: '**/*.trx'
           searchFolder: '$(System.DefaultWorkingDirectory)'
           failTaskOnFailedTests: true
+
+      - task: SonarCloudAnalyze@4
+        displayName: Run SonarCloud analysis
+
+      - task: SonarCloudPublish@4
+        displayName: Publish Quality Gate result
+        inputs:
+          pollingTimeoutSec: '300'
 
       - script: dotnet publish StockFlow.Api/StockFlow.Api.csproj --configuration $(buildConfiguration) --output "$(publishDir)" --no-build
         displayName: Publish API
