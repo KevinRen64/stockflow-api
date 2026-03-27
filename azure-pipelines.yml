@@ -42,7 +42,8 @@ stages:
           scannerMode: 'dotnet'
           projectKey: 'KevinRen64_stockflow-api'
           projectName: 'stockflow-api'
-          extraProperties: sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/**/coverage.opencover.xml
+          extraProperties: |
+            sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)\TestResults\coverage.opencover.xml
 
       - script: dotnet restore StockFlow.sln
         displayName: Restore
@@ -50,15 +51,14 @@ stages:
       - script: dotnet build StockFlow.sln --configuration $(buildConfiguration) --no-restore
         displayName: Build
       
-      - script: dotnet test StockFlow.UnitTests/StockFlow.UnitTests.csproj --configuration $(buildConfiguration) --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      - script: dotnet test StockFlow.UnitTests/StockFlow.UnitTests.csproj --configuration $(buildConfiguration) --no-build --logger "trx;LogFileName=test-results.trx" --results-directory "$(Agent.TempDirectory)\TestResults" /p:CollectCoverage=true /p:CoverletOutput=$(Agent.TempDirectory)\TestResults\coverage /p:CoverletOutputFormat=opencover
         displayName: Run unit tests with coverage
       
       - task: PublishTestResults@2
         displayName: Publish test results
         inputs:
           testResultsFormat: 'VSTest'
-          testResultsFiles: '**/*.trx'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
+          testResultsFiles: '$(Agent.TempDirectory)\TestResults\test-results.trx'
           failTaskOnFailedTests: true
 
       - task: SonarCloudAnalyze@4
