@@ -34,12 +34,23 @@ stages:
           echo Pipeline.Workspace=$(Pipeline.Workspace)
         displayName: Show build workspace info
 
-      - script: dotnet restore
+      - script: dotnet restore StockFlow.sln
         displayName: Restore
 
-      - script: dotnet build --configuration $(buildConfiguration) --no-restore
+      - script: dotnet build StockFlow.sln --configuration $(buildConfiguration) --no-restore
         displayName: Build
       
+      - script: dotnet test StockFlow.UnitTests/StockFlow.UnitTests.csproj --configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage" --logger "trx"
+        displayName: Run unit tests with coverage
+      
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        inputs:
+          testResultsFormat: 'VSTest'
+          testResultsFiles: '**/*.trx'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          failTaskOnFailedTests: true
+
       - script: dotnet publish StockFlow.Api/StockFlow.Api.csproj --configuration $(buildConfiguration) --output "$(publishDir)" --no-build
         displayName: Publish API
 
